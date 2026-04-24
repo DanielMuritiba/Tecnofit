@@ -9,6 +9,27 @@ $dotenv->load();
 
 header('Content-Type: application/json');
 
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    header('Allow: GET');
+    echo json_encode(['error' => 'Método não permitido.']);
+    exit;
+}
+
+$movementParam = trim($_GET['movimento'] ?? '');
+
+if ($movementParam === '') {
+    http_response_code(400);
+    echo json_encode(['error' => 'O parâmetro "movimento" é obrigatório.']);
+    exit;
+}
+
+if (strlen($movementParam) > 255) {
+    http_response_code(400);
+    echo json_encode(['error' => 'O parâmetro "movimento" é inválido.']);
+    exit;
+}
+
 try {
     $pdo = Connection::make();
 
