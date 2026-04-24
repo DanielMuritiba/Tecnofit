@@ -8,7 +8,7 @@ class RankingRepository
 
     public function getByMovement(string $movementParam): ?array
     {
-
+        $params = [];
         if (ctype_digit($movementParam)) {
             $movementId = (int) $movementParam;
             $where = 'm.id = :movementId';
@@ -59,6 +59,7 @@ class RankingRepository
         }
 
         $result = [];
+        //Permite o retorno de múltiplos movimentos a partir do $movementName
         foreach ($movementsRanking as $movement) {
             $movementName = $movement['movementName'];
 
