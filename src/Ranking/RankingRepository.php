@@ -14,7 +14,7 @@ class RankingRepository
             $where = 'm.id = :movementId';
             $params[':movementId'] = $movementId;
         }else{
-            $movementName = trim($movementParam);
+            $movementName = $movementParam;
             $where = 'm.name LIKE :movementName';
             $params[':movementName'] = '%' . $movementName . '%';
         }
@@ -59,19 +59,25 @@ class RankingRepository
         }
 
         $result = [];
+        $movementIndex = [];
+
         //Permite o retorno de múltiplos movimentos a partir do $movementName
         foreach ($movementsRanking as $movement) {
             $movementName = $movement['movementName'];
 
-            if (!isset($result[$movementName])) {
-                $result[$movementName] = [];
+            if (!isset($movementIndex[$movementName])) {
+                $movementIndex[$movementName] = count($result);
+                $result[] = [
+                    'movement' => $movementName,
+                    'ranking'  => [],
+                ];
             }
 
-            $result[$movementName][] = [
-                'userName' => $movement['userName'],
+            $result[$movementIndex[$movementName]]['ranking'][] = [
+                'userName'       => $movement['userName'],
                 'personalRecord' => (float) $movement['personalRecord'],
-                'rankPosition' => (int) $movement['rankPosition'],
-                'recordDate' => $movement['recordDate'],
+                'rankPosition'   => (int) $movement['rankPosition'],
+                'recordDate'     => $movement['recordDate'],
             ];
         }
 
