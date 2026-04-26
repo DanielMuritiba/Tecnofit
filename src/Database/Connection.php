@@ -4,16 +4,18 @@ namespace Src\Database;
 
 class Connection
 {
+    /** Creates and returns a PDO connection configured via environment variables. */
     public static function make(): \PDO
     {
-        $dsn = sprintf(
-            'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-            $_ENV['DB_HOST'],
-            $_ENV['DB_PORT'],
-            $_ENV['DB_NAME']
-        );
+        $host = $_ENV['DB_HOST'];
+        $port = $_ENV['DB_PORT'];
+        $dbName = $_ENV['DB_NAME'];
+        $userName = $_ENV['DB_USER'];
+        $password = $_ENV['DB_PASS'];
 
-        return new \PDO($dsn, $_ENV['DB_USER'], $_ENV['DB_PASS'], [
+        $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
+
+        return new \PDO($dsn, $userName, $password, [
             \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
         ]);
