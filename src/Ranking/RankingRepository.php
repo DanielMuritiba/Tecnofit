@@ -6,18 +6,16 @@ class RankingRepository
 {
     public function __construct(private \PDO $pdo) {}
 
+    /**
+     * Returns the ranking for a movement searched by ID (numeric) or partial name (LIKE).
+     * Uses ROW_NUMBER to isolate each user's personal record and DENSE_RANK for tie handling.
+     */
     public function getByMovement(string $movementParam): ?array
     {
-        $params = [];
-        if (ctype_digit($movementParam)) {
-            $movementId = (int) $movementParam;
-            $where = 'm.id = :movementId';
-            $params[':movementId'] = $movementId;
-        }else{
-            $movementName = $movementParam;
-            $where = 'm.name LIKE :movementName';
-            $params[':movementName'] = '%' . $movementName . '%';
-        }
+        $params = [
+            ':movementId'   => ctype_digit($movementParam) ? (int) $movementParam : null,
+            ':movementName' => ctype_digit($movementParam) ? null : '%' . $movementParam . '%',
+        ];
 
         $sql = "
             SELECT
@@ -41,7 +39,7 @@ class RankingRepository
                     ) AS rn
                 FROM personal_record pr
                 JOIN movement m ON m.id = pr.movement_id
-                WHERE $where
+                WHERE m.id = :movementId OR m.name LIKE :movementName
             ) t
             JOIN user u ON u.id = t.user_id
             JOIN movement m ON m.id = t.movement_id
@@ -61,7 +59,6 @@ class RankingRepository
         $result = [];
         $movementIndex = [];
 
-        //Permite o retorno de múltiplos movimentos a partir do $movementName
         foreach ($movementsRanking as $movement) {
             $movementName = $movement['movementName'];
 

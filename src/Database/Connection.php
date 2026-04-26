@@ -4,6 +4,7 @@ namespace Src\Database;
 
 class Connection
 {
+    /** Creates and returns a PDO connection configured via environment variables. */
     public static function make(): \PDO
     {
         $host = $_ENV['DB_HOST'];
